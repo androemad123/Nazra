@@ -1,0 +1,30 @@
+flutter_native_splash:
+  # Background colors
+  color: "#ffffff"          # Light mode background
+  color_dark: "#573C12"     # Dark mode background
+
+  # Splash icons for older Android & iOS
+  image: assets/images/logoLight.png
+  image_dark: assets/images/logoDark.png
+
+  android: true
+  ios: true
+  web: false
+
+  # Content alignment
+  android_gravity: center
+  ios_content_mode: center
+
+  # ✅ Android 12 specific settings
+  android_12:
+    # Backgrounds
+    color: "#ffffff"
+    color_dark: "#573C12"
+
+    # Icons
+    image: assets/images/logoLight.png
+    image_dark: assets/images/logoDark.png
+
+    # Icon background (optional, if your icon is not full-bleed)
+    icon_background_color: "#ffffff"
+    icon_background_color_dark: "#573C12"
