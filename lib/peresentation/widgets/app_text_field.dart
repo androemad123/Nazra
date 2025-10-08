@@ -28,28 +28,34 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fieldBackgroundColor = isDark ? ColorManager.darkCream : Colors.white;
+    final borderColor = theme.colorScheme.primary.withOpacity(0.2);
+    final hintColor = theme.textTheme.bodyMedium?.color?.withOpacity(0.6) ?? Colors.grey;
+    final iconColor = hintColor;
     return Container(
       margin: EdgeInsets.symmetric(vertical: AppMargin.m12),
       padding: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: fieldBackgroundColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.1),
+            color: theme.shadowColor.withOpacity(0.1),
             spreadRadius: 2,
             blurRadius: 6,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Theme.of(context).hoverColor),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         children: [
           if (prefixIcon != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Icon(prefixIcon, color: Colors.grey),
+              child: Icon(prefixIcon, color: iconColor),
             ),
           Expanded(
             child: TextFormField(
@@ -61,7 +67,7 @@ class AppTextField extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle:  TextStyle(
-                  color: ColorManager.gray,
+                  color: hintColor,
                   fontFamily: "Poppins",
                 ),
                 border: InputBorder.none,
@@ -77,7 +83,7 @@ class AppTextField extends StatelessWidget {
               onPressed: onToggleObscure,
               icon: Icon(
                 obscureText ? Icons.visibility_off : Icons.visibility,
-                color: Colors.grey,
+                color: iconColor,
               ),
             ),
         ],

@@ -71,7 +71,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     BuildPage(
                       imageHeight: 351,
                       imageWidth: double.maxFinite,
-                      imagePath: 'assets/images/onboarding (1).png',
+                      imagePath: 'assets/images/onboarding1.png',
                       title: "See, Snap, Improve",
                       subtitle:
                       "With every glance, our streets get better. Report an issue and see it fixed",
@@ -79,7 +79,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     BuildPage(
                       imageHeight: 340,
                       imageWidth: 350,
-                      imagePath: "assets/images/onboarding (2).png",
+                      imagePath: "assets/images/onboarding2.png",
                       title: "Report in Seconds",
                       subtitle:
                       "It’s faster than you think. Snap a photo, add the location, and send your report in under 30 seconds.",
@@ -87,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     BuildPage(
                       imageWidth: 360,
                       imageHeight: 340,
-                      imagePath: "assets/images/onboarding(3).png",
+                      imagePath: "assets/images/onboarding3.png",
                       title: "Follow the Progress",
                       subtitle:
                       "Stay updated every step of the way. From new report to solved — see how Nazra turns issues into improvements.",

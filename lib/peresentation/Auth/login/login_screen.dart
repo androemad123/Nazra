@@ -1,9 +1,16 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:nazra/peresentation/resources/styles_manager.dart';
 import 'package:nazra/peresentation/resources/value_manager.dart';
+import 'package:nazra/peresentation/widgets/app_text_btn.dart';
+import 'package:nazra/peresentation/widgets/social_auth_btn.dart';
+import 'package:nazra/routing/routes.dart';
+import 'package:provider/provider.dart';
 
+import '../../../app/providers/theme_provider.dart';
 import '../../resources/color_manager.dart';
 import '../../widgets/app_text_field.dart';
+import '../../widgets/divider_with_text.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,47 +21,175 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController textEditingController = TextEditingController();
+  bool rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding:  EdgeInsets.all(AppPadding.p18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Welcome",
-              style: boldStyle(
-                fontSize: 40, color: Colors.transparent,
-              ).copyWith(
-                foreground: Paint()
-                  ..shader =  LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment. topLeft,
-                    colors: [
-                      ColorManager.brown,
-                      ColorManager.white,
-                    ],
-                  ).createShader(
-                    Rect.fromLTWH(0, 0, 200, 70), // width/height of the text box
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: themeProvider.isDarkMode
+                ? [
+                    Theme.of(context).colorScheme.surface, // beige
+                    Theme.of(context).colorScheme.secondary, // lighter brown
+                    Theme.of(context).colorScheme.surface, // beige
+                  ]
+                : [
+                    Theme.of(context).colorScheme.surface, // beige
+                    Theme.of(context).colorScheme.background, // white
+                    Theme.of(context).colorScheme.surface, // beige
+                  ],
+          ),
+        ),
+        child: SafeArea(
+          top: true,
+          minimum: EdgeInsets.only(top: 70),
+          child: Padding(
+            padding: EdgeInsets.all(AppPadding.p18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Welcome",
+                  style: semiBoldStyle(
+                    fontSize: 40,
+                    color: Colors.transparent,
+                  ).copyWith(
+                    foreground: Paint()
+                      ..shader = LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.centerRight,
+                        colors: [
+                          ColorManager.brown,
+                          ColorManager.cream,
+                        ],
+                      ).createShader(
+                        const Rect.fromLTWH(
+                            0, 110, 0, 100), // width/height of the text box
+                      ),
                   ),
-              ),
+                ),
+                Text(
+                  "Back",
+                  style: semiBoldStyle(fontSize: 40, color: Colors.black),
+                ),
+                AppTextField(
+                  hintText: "Email",
+                  isPassword: false,
+                  controller: textEditingController,
+                  prefixIcon: Icons.email_outlined,
+                ),
+                AppTextField(
+                  hintText: "Password",
+                  isPassword: true,
+                  controller: textEditingController,
+                  prefixIcon: Icons.lock_outline,
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: rememberMe,
+                      onChanged: (val) {
+                        setState(() {
+                          rememberMe = val ?? false;
+                        });
+                      },
+                    ),
+                    Text(
+                      "Remember me",
+                      style: regularStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.black,
+                      ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/forgetPasswordRoute');
+                      },
+                      child: Text('Forgot password?',
+                          style: regularStyle(
+                            fontSize: 14,
+                            color:
+                                Theme.of(context).textTheme.bodyMedium?.color ??
+                                    Colors.black,
+                          )),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                AppTextBtn(
+                    buttonText: "Login",
+                    textStyle: semiBoldStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {}),
+                SizedBox(
+                  height: 30,
+                ),
+                DividerWithText(
+                  text: "Or continue with",
+                  lineColor: Colors.grey.shade400,
+                  textStyle: regularStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.black,
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SocialAuthBtn( assetPath: 'assets/images/google.jpg',onTap: (){},),
+                    const SizedBox(width: 25),
+                    SocialAuthBtn( assetPath: 'assets/images/facebook.jpg', onTap: () {
+                      // Facebook sign in
+                    }),
+                    const SizedBox(width: 25),
+                    SocialAuthBtn(assetPath: 'assets/images/apple.jpg', onTap: () {
+                      // Apple sign in
+                    }),
+                  ],
+                ),
+                SizedBox(
+                  height: 50,
+                ),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'Don\'t have an account? ',
+                      style: regularStyle(fontSize: 16, color: Colors.black54),
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: 'Sign up',
+                          style: semiBoldStyle(
+                            fontSize: 16,
+                            color: ColorManager.brown,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              Navigator.of(context)
+                                  .pushNamed(Routes.signUpRoute);
+                            },
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
             ),
-            AppTextField(
-              hintText: "hey this is testing ",
-              isPassword: false,
-              controller: textEditingController,
-              prefixIcon: Icons.email,
-            ),
-            AppTextField(
-              hintText: "hey this is testing ",
-              isPassword: false,
-              controller: textEditingController,
-              prefixIcon: Icons.email,
-            ),
-          ],
+          ),
         ),
       ),
     );
