@@ -1,67 +1,92 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nazra/peresentation/resources/color_manager.dart';
+import 'package:nazra/peresentation/resources/value_manager.dart';
 
 class AppTextField extends StatelessWidget {
-  final String label;
-  final IconData prefixIcon;
-  final IconData? suffixIcon;
-  final TextEditingController? controller;
+  final TextEditingController controller;
+  final String hintText;
+  final IconData? prefixIcon;
+  final bool isPassword;
   final bool obscureText;
-  final TextInputType keyboardType;
+  final VoidCallback? onToggleObscure;
   final String? Function(String?)? validator;
-  final void Function()? onSuffixIconPressed;
+  final Function(String)? onChanged;
+  final TextInputType keyboardType;
 
   const AppTextField({
     super.key,
-    required this.label,
-    required this.prefixIcon,
-    this.suffixIcon,
-    this.controller,
+    required this.controller,
+    required this.hintText,
+    this.prefixIcon,
+    this.isPassword = false,
     this.obscureText = false,
-    this.keyboardType = TextInputType.text,
+    this.onToggleObscure,
     this.validator,
-    this.onSuffixIconPressed,
+    this.onChanged,
+    this.keyboardType = TextInputType.text,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fieldBackgroundColor = isDark ? ColorManager.darkCream : Colors.white;
+    final borderColor = theme.colorScheme.primary.withOpacity(0.2);
+    final hintColor = theme.textTheme.bodyMedium?.color?.withOpacity(0.6) ?? Colors.grey;
+    final iconColor = hintColor;
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 0),
+      margin: EdgeInsets.symmetric(vertical: AppMargin.m12),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(25.r),
+        color: fieldBackgroundColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).shadowColor,
-            spreadRadius: 5.r,
-            blurRadius: 10.r,
-            offset: const Offset(0, 10),
+            color: theme.shadowColor.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 6,
+            offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Theme.of(context).hoverColor),
+        border: Border.all(color: borderColor),
       ),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        validator: validator,
-        decoration: InputDecoration(
-          hint: Text(label, style: Theme.of(context).textTheme.bodySmall,),
-          
-          contentPadding: EdgeInsets.symmetric(
-            vertical: 8,
-            horizontal: 8,
+      child: Row(
+        children: [
+          if (prefixIcon != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Icon(prefixIcon, color: iconColor),
+            ),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              obscureText: isPassword ? obscureText : false,
+              validator: validator,
+              onChanged: onChanged,
+              keyboardType: keyboardType,
+              decoration: InputDecoration(
+                hintText: hintText,
+                hintStyle:  TextStyle(
+                  color: hintColor,
+                  fontFamily: "Poppins",
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 8,
+                ),
+              ),
+            ),
           ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25.r),
-            borderSide: BorderSide.none,
-          ),
-          prefixIcon: Icon(prefixIcon),
-          suffix: IconButton(
-            onPressed: onSuffixIconPressed,
-            icon: Icon(suffixIcon),
-          ),
-        ),
+          if (isPassword)
+            IconButton(
+              onPressed: onToggleObscure,
+              icon: Icon(
+                obscureText ? Icons.visibility_off : Icons.visibility,
+                color: iconColor,
+              ),
+            ),
+        ],
       ),
     );
   }

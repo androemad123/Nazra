@@ -2,51 +2,64 @@ import 'package:flutter/material.dart';
 import 'package:nazra/peresentation/resources/font_manager.dart';
 
 import 'color_manager.dart';
+import 'font_manager.dart';
 
 class ThemeManager {
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
+    fontFamily: FontConstants.fontFamily,
     primaryColor: ColorManager.brown,
     scaffoldBackgroundColor: ColorManager.white,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: ColorManager.brown,
-      foregroundColor: ColorManager.white,
-      elevation: 0,
-    ),
     textTheme: TextTheme(
-      titleMedium: TextStyle(
-        color: ColorManager.black,
-        fontSize: FontSize.s26,
-        fontFamily: FontConstants.fontFamily,
-      ),
-      bodyLarge: TextStyle(
-        color: ColorManager.gray,
-        fontSize: FontSize.s24,
-        fontFamily: FontConstants.fontFamily,
-      ),
-      bodyMedium: TextStyle(
-        color: ColorManager.gray,
-        fontSize: FontSize.s20,
-        fontFamily: FontConstants.fontFamily,
-      ),
-      bodySmall: TextStyle(
-        color: ColorManager.gray,
-        fontSize: FontSize.s16,
-        fontFamily: FontConstants.fontFamily,
-      ),
+      displayLarge: TextStyle(fontFamily: FontConstants.fontFamily),
+      displayMedium: TextStyle(fontFamily: FontConstants.fontFamily),
+      displaySmall: TextStyle(fontFamily: FontConstants.fontFamily),
+      headlineLarge: TextStyle(fontFamily: FontConstants.fontFamily),
+      headlineMedium: TextStyle(fontFamily: FontConstants.fontFamily),
+      headlineSmall: TextStyle(fontFamily: FontConstants.fontFamily),
       titleLarge: TextStyle(
-        color: ColorManager.brown,
-        fontWeight: FontWeight.bold,
-        fontSize: FontSize.s28,
+        color: ColorManager.black,
+        fontWeight: FontWeightManager.semiBold,
+        fontFamily: FontConstants.fontFamily,
       ),
+      titleMedium: TextStyle(fontFamily: FontConstants.fontFamily),
+      titleSmall: TextStyle(fontFamily: FontConstants.fontFamily),
+      bodyLarge: const TextStyle(color: ColorManager.lightGray),
+      bodyMedium: const TextStyle(color: ColorManager.gray),
+      bodySmall: const TextStyle(color: ColorManager.gray),
+      labelLarge: TextStyle(fontFamily: FontConstants.fontFamily),
+      labelMedium: TextStyle(fontFamily: FontConstants.fontFamily),
+      labelSmall: TextStyle(fontFamily: FontConstants.fontFamily),
     ),
     colorScheme: const ColorScheme.light(
       primary: ColorManager.brown,
       secondary: ColorManager.lightBrown,
       surface: ColorManager.beige,
-      onPrimary: ColorManager.white,
+      onPrimary: ColorManager.black,
       onSecondary: ColorManager.white,
       onSurface: ColorManager.gray,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: ColorManager.brown,
+        foregroundColor: ColorManager.white,
+        disabledBackgroundColor: ColorManager.lightGray,
+        disabledForegroundColor: ColorManager.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        textStyle: TextStyle(
+          fontWeight: FontWeightManager.semiBold,
+        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: ColorManager.black,
+        textStyle: TextStyle(
+          fontWeight: FontWeightManager.semiBold,
+        ),
+      ),
     ),
     shadowColor: Colors.grey.shade100,
     hoverColor: null,
@@ -54,21 +67,27 @@ class ThemeManager {
 
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
+    fontFamily: FontConstants.fontFamily,
     primaryColor: ColorManager.darkBrown,
-    scaffoldBackgroundColor: ColorManager.black,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: ColorManager.darkBrown,
-      foregroundColor: ColorManager.white,
-      elevation: 0,
-    ),
+    // Lighten overall dark background as requested
+    scaffoldBackgroundColor: ColorManager.beige,
+
     textTheme: const TextTheme(
+      displayLarge: TextStyle(fontFamily: FontConstants.fontFamily),
+      displayMedium: TextStyle(fontFamily: FontConstants.fontFamily),
+      displaySmall: TextStyle(fontFamily: FontConstants.fontFamily),
+      headlineLarge: TextStyle(fontFamily: FontConstants.fontFamily),
+      headlineMedium: TextStyle(fontFamily: FontConstants.fontFamily),
+      headlineSmall: TextStyle(fontFamily: FontConstants.fontFamily),
+      titleLarge: TextStyle(color: ColorManager.white, fontWeight: FontWeight.bold, fontFamily: FontConstants.fontFamily),
+      titleMedium: TextStyle(fontFamily: FontConstants.fontFamily),
+      titleSmall: TextStyle(fontFamily: FontConstants.fontFamily),
       bodyLarge: TextStyle(color: ColorManager.lightGray),
-      bodyMedium: TextStyle(color: ColorManager.lightGray),
+      bodyMedium: TextStyle(color: ColorManager.lighterGray),
       bodySmall: TextStyle(color: ColorManager.lightGray),
-      titleLarge: TextStyle(
-        color: ColorManager.darkLightBrown,
-        fontWeight: FontWeight.bold,
-      ),
+      labelLarge: TextStyle(fontFamily: FontConstants.fontFamily),
+      labelMedium: TextStyle(fontFamily: FontConstants.fontFamily),
+      labelSmall: TextStyle(fontFamily: FontConstants.fontFamily),
     ),
     colorScheme: const ColorScheme.dark(
       primary: ColorManager.darkBrown,
@@ -77,6 +96,28 @@ class ThemeManager {
       onPrimary: ColorManager.white,
       onSecondary: ColorManager.white,
       onSurface: ColorManager.lightGray,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: ColorManager.darkBrown,
+        foregroundColor: ColorManager.white,
+        disabledBackgroundColor: ColorManager.darkLightBrown,
+        disabledForegroundColor: ColorManager.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        textStyle: TextStyle(
+          fontWeight: FontWeightManager.semiBold,
+        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: ColorManager.darkLightBrown,
+        textStyle: TextStyle(
+          fontWeight: FontWeightManager.semiBold,
+        ),
+      ),
     ),
   );
 }

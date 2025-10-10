@@ -45,7 +45,7 @@ class _NazraAppState extends State<NazraApp> {
           ],
           supportedLocales: S.delegate.supportedLocales,
           debugShowCheckedModeBanner: false,
-          initialRoute: Routes.loginRoute,
+          initialRoute: Routes.onboardingRoute,
           onGenerateRoute: widget.appRouter.onGenerateRoute,
         );
       },

@@ -5,6 +5,8 @@ import 'package:nazra/peresentation/Home/home.dart';
 import 'package:nazra/peresentation/onBoarding/onboarding_screen.dart';
 import 'package:nazra/routing/routes.dart';
 
+import '../peresentation/forget Password/forget_password_screen.dart';
+
 class AppRouter {
   AppRouter();
   Route? onGenerateRoute(RouteSettings settings) {
@@ -17,6 +19,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case Routes.signUpRoute:
         return MaterialPageRoute(builder: (_) => const SignupScreen());
+      case Routes.forgetPasswordRoute:
+        return MaterialPageRoute(builder: (_) => const ForgetPasswordScreen());
       default:
         return null;
     }
