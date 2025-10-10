@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nazra/peresentation/resources/font_manager.dart';
 
 import 'color_manager.dart';
 
@@ -12,11 +13,32 @@ class ThemeManager {
       foregroundColor: ColorManager.white,
       elevation: 0,
     ),
-    textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: ColorManager.gray),
-      bodyMedium: TextStyle(color: ColorManager.gray),
-      bodySmall: TextStyle(color: ColorManager.gray),
-      titleLarge: TextStyle(color: ColorManager.brown, fontWeight: FontWeight.bold),
+    textTheme: TextTheme(
+      titleMedium: TextStyle(
+        color: ColorManager.black,
+        fontSize: FontSize.s26,
+        fontFamily: FontConstants.fontFamily,
+      ),
+      bodyLarge: TextStyle(
+        color: ColorManager.gray,
+        fontSize: FontSize.s24,
+        fontFamily: FontConstants.fontFamily,
+      ),
+      bodyMedium: TextStyle(
+        color: ColorManager.gray,
+        fontSize: FontSize.s20,
+        fontFamily: FontConstants.fontFamily,
+      ),
+      bodySmall: TextStyle(
+        color: ColorManager.gray,
+        fontSize: FontSize.s16,
+        fontFamily: FontConstants.fontFamily,
+      ),
+      titleLarge: TextStyle(
+        color: ColorManager.brown,
+        fontWeight: FontWeight.bold,
+        fontSize: FontSize.s28,
+      ),
     ),
     colorScheme: const ColorScheme.light(
       primary: ColorManager.brown,
@@ -25,8 +47,9 @@ class ThemeManager {
       onPrimary: ColorManager.white,
       onSecondary: ColorManager.white,
       onSurface: ColorManager.gray,
-
     ),
+    shadowColor: Colors.grey.shade100,
+    hoverColor: null,
   );
 
   static ThemeData darkTheme = ThemeData(
@@ -42,7 +65,10 @@ class ThemeManager {
       bodyLarge: TextStyle(color: ColorManager.lightGray),
       bodyMedium: TextStyle(color: ColorManager.lightGray),
       bodySmall: TextStyle(color: ColorManager.lightGray),
-      titleLarge: TextStyle(color: ColorManager.darkLightBrown, fontWeight: FontWeight.bold),
+      titleLarge: TextStyle(
+        color: ColorManager.darkLightBrown,
+        fontWeight: FontWeight.bold,
+      ),
     ),
     colorScheme: const ColorScheme.dark(
       primary: ColorManager.darkBrown,
