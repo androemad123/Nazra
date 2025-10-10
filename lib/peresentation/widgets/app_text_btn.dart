@@ -43,7 +43,6 @@ class AppTextBtn extends StatelessWidget {
         ),
       ),
       child: TextButton(
-
         onPressed: onPressed,
         style: ButtonStyle(
           overlayColor: WidgetStateProperty.all<Color>(Colors.transparent), // 👈 removes splash

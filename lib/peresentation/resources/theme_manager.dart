@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:nazra/peresentation/resources/font_manager.dart';
 
 import 'color_manager.dart';
-import 'font_manager.dart';
 
 class ThemeManager {
   static ThemeData lightTheme = ThemeData(
+    appBarTheme: AppBarTheme(
+      backgroundColor: ColorManager.white,
+      foregroundColor: ColorManager.black,
+      centerTitle: true,
+    ),
     brightness: Brightness.light,
     fontFamily: FontConstants.fontFamily,
     primaryColor: ColorManager.brown,
