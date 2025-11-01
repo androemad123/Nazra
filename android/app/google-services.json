@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "707222535071",
+    "project_id": "nazra-274ec",
+    "storage_bucket": "nazra-274ec.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707222535071:android:2804b08f65650c191e1baa",
+        "android_client_info": {
+          "package_name": "com.example.nazra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6SRjaplI7FbHwG_xQgIzBO-wyWCHAsUs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

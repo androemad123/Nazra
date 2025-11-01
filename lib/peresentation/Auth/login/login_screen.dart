@@ -1,17 +1,24 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nazra/peresentation/resources/styles_manager.dart';
-import 'package:nazra/peresentation/resources/value_manager.dart';
-import 'package:nazra/peresentation/widgets/app_text_btn.dart';
-import 'package:nazra/peresentation/widgets/social_auth_btn.dart';
-import 'package:nazra/routing/routes.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../app/bloc/auth/auth_bloc.dart';
+import '../../../app/bloc/auth/auth_event.dart';
+import '../../../app/bloc/auth/auth_state.dart';
 import '../../../app/providers/theme_provider.dart';
+import '../../../routing/routes.dart';
 import '../../resources/color_manager.dart';
+import '../../resources/styles_manager.dart';
+import '../../resources/value_manager.dart';
+import '../../widgets/app_text_btn.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/divider_with_text.dart';
+import '../../widgets/social_auth_btn.dart';
+
+// Bloc imports
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,180 +28,268 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController textEditingController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
   bool rememberMe = false;
+
+  void _onLoginPressed(BuildContext context) {
+    if (_formKey.currentState?.validate() ?? false) {
+      context.read<AuthBloc>().add(
+        AuthLoginRequested(
+          email: _emailCtrl.text.trim(),
+          password: _passwordCtrl.text.trim(),
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: themeProvider.isDarkMode
-                ? [
-                    Theme.of(context).colorScheme.surface, // beige
-                    Theme.of(context).colorScheme.secondary, // lighter brown
-                    Theme.of(context).colorScheme.surface, // beige
-                  ]
-                : [
-                    Theme.of(context).colorScheme.surface, // beige
-                    Theme.of(context).colorScheme.background, // white
-                    Theme.of(context).colorScheme.surface, // beige
-                  ],
-          ),
-        ),
-        child: SafeArea(
-          top: true,
-          minimum: EdgeInsets.only(top: 70.h),
-          child: Padding(
-            padding: EdgeInsets.all(AppPadding.p18),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Welcome",
-                    style: semiBoldStyle(
-                      fontSize: 40.sp,
-                      color: Colors.transparent,
-                    ).copyWith(
-                      foreground: Paint()
-                        ..shader = LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.centerRight,
-                          colors: [
-                            ColorManager.brown,
-                            ColorManager.cream,
-                          ],
-                        ).createShader(
-                          const Rect.fromLTWH(
-                              0, 110, 0, 100), // width/height of the text box
-                        ),
-                    ),
-                  ),
-                  Text(
-                    "Back",
-                    style: semiBoldStyle(fontSize: 40.sp, color: Colors.black),
-                  ),
-                  AppTextField(
-                    hintText: "Email",
-                    isPassword: false,
-                    controller: textEditingController,
-                    prefixIcon: Icons.email_outlined,
-                  ),
-                  AppTextField(
-                    hintText: "Password",
-                    isPassword: true,
-                    controller: textEditingController,
-                    prefixIcon: Icons.lock_outline,
-                  ),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: rememberMe,
-                        onChanged: (val) {
-                          setState(() {
-                            rememberMe = val ?? false;
-                          });
-                        },
-                      ),
-                      Text(
-                        "Remember me",
-                        style: regularStyle(
-                          fontSize: 14.sp,
-                          color: Theme.of(context).textTheme.bodyMedium?.color ??
-                              Colors.black,
-                        ),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/forgetPasswordRoute');
-                        },
-                        child: Text('Forgot password?',
-                            style: regularStyle(
-                              fontSize: 14.sp,
-                              color:
-                                  Theme.of(context).textTheme.bodyMedium?.color ??
-                                      Colors.black,
-                            )),
-                      ),
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state.status == AuthStatus.failure && state.error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error!),
+              backgroundColor: Colors.redAccent,
+            ),
+          );
+        } else if (state.status == AuthStatus.authenticated) {
+          Navigator.of(context).pushReplacementNamed(Routes.homeScreenState);
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state.status == AuthStatus.loading;
+
+        return Scaffold(
+          body: Stack(
+            children: [
+              Container(
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: themeProvider.isDarkMode
+                        ? [
+                      Theme.of(context).colorScheme.surface,
+                      Theme.of(context).colorScheme.secondary,
+                      Theme.of(context).colorScheme.surface,
+                    ]
+                        : [
+                      Theme.of(context).colorScheme.surface,
+                      Theme.of(context).colorScheme.background,
+                      Theme.of(context).colorScheme.surface,
                     ],
                   ),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  AppTextBtn(
-                      buttonText: "Login",
-                      textStyle: semiBoldStyle(
-                        fontSize: 18.sp,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {}),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  DividerWithText(
-                    text: "Or continue with",
-                    lineColor: Colors.grey.shade400,
-                    textStyle: regularStyle(
-                      fontSize: 14.sp,
-                      color: Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.black,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SocialAuthBtn( assetPath: 'assets/images/google.jpg',onTap: (){},),
-                      SizedBox(width: 25.w),
-                      SocialAuthBtn( assetPath: 'assets/images/facebook.jpg', onTap: () {
-                        // Facebook sign in
-                      }),
-                       SizedBox(width: 25.w),
-                      SocialAuthBtn(assetPath: 'assets/images/apple.jpg', onTap: () {
-                        // Apple sign in
-                      }),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  Center(
-                    child: RichText(
-                      text: TextSpan(
-                        text: 'Don\'t have an account? ',
-                        style: regularStyle(fontSize: 16.sp, color: Colors.black54),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'Sign up',
-                            style: semiBoldStyle(
-                              fontSize: 16.sp,
-                              color: ColorManager.brown,
+                ),
+              ),
+              SafeArea(
+                top: true,
+                minimum: EdgeInsets.only(top: 70.h),
+                child: Padding(
+                  padding: EdgeInsets.all(AppPadding.p18),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ShaderMask(
+                            shaderCallback: (bounds) => LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                ColorManager.brown,
+                                ColorManager.brown,
+                                ColorManager.cream,
+                              ],
+                            ).createShader(bounds),
+                            child: Text(
+                              "Welcome",
+                              style: semiBoldStyle(
+                                fontSize: 40.sp,
+                                color: Colors.white,
+                              ),
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                Navigator.of(context)
-                                    .pushNamed(Routes.signUpRoute);
-                              },
                           ),
+                          Text(
+                            "Back",
+                            style: semiBoldStyle(
+                                fontSize: 40.sp, color: Colors.black),
+                          ),
+                          SizedBox(height: 20.h),
+
+                          // Email field
+                          AppTextField(
+                            hintText: "Email",
+                            isPassword: false,
+                            controller: _emailCtrl,
+                            prefixIcon: Icons.email_outlined,
+                            validator: (val) {
+                              if (val == null || val.isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              if (!val.contains('@')) {
+                                return 'Invalid email';
+                              }
+                              return null;
+                            },
+                          ),
+
+                          // Password field
+                          AppTextField(
+                            hintText: "Password",
+                            isPassword: true,
+                            controller: _passwordCtrl,
+                            prefixIcon: Icons.lock_outline,
+                            validator: (val) {
+                              if (val == null || val.isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              return null;
+                            },
+                          ),
+
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: rememberMe,
+                                onChanged: (val) =>
+                                    setState(() => rememberMe = val ?? false),
+                              ),
+                              Text(
+                                "Remember me",
+                                style: regularStyle(
+                                  fontSize: 14.sp,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color ??
+                                      Colors.black,
+                                ),
+                              ),
+                              const Spacer(),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pushNamed('/forgetPasswordRoute');
+                                },
+                                child: Text('Forgot password?',
+                                    style: regularStyle(
+                                      fontSize: 14.sp,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color ??
+                                          Colors.black,
+                                    )),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 30.h),
+
+                          // Login button
+                          AppTextBtn(
+                            buttonText: isLoading ? "Logging in..." : "Login",
+                            textStyle: semiBoldStyle(
+                              fontSize: 18.sp,
+                              color: Colors.white,
+                            ),
+                            onPressed: isLoading
+                                ? (){}
+                                : () => _onLoginPressed(context),
+                          ),
+                          SizedBox(height: 30.h),
+
+                          DividerWithText(
+                            text: "Or continue with",
+                            lineColor: Colors.grey.shade400,
+                            textStyle: regularStyle(
+                              fontSize: 14.sp,
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.color ??
+                                  Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 30.h),
+
+                          // Social buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SocialAuthBtn(
+                                assetPath: 'assets/images/google.jpg',
+                                onTap: () {},
+                              ),
+                              SizedBox(width: 25.w),
+                              SocialAuthBtn(
+                                assetPath: 'assets/images/facebook.jpg',
+                                onTap: () {},
+                              ),
+                              SizedBox(width: 25.w),
+                              SocialAuthBtn(
+                                assetPath: 'assets/images/apple.jpg',
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10.h),
+
+                          Center(
+                            child: RichText(
+                              text: TextSpan(
+                                text: 'Don\'t have an account? ',
+                                style: regularStyle(
+                                  fontSize: 16.sp,
+                                  color: Colors.black54,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: 'Sign up',
+                                    style: semiBoldStyle(
+                                      fontSize: 16.sp,
+                                      color: ColorManager.brown,
+                                    ),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => Navigator.of(context)
+                                          .pushNamed(Routes.signUpRoute),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
-                  )
-                ],
+                  ),
+                ),
               ),
-            ),
+
+              // Loading overlay
+              if (isLoading)
+                Container(
+                  color: Colors.black26,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+            ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

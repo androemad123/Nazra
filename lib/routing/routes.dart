@@ -7,5 +7,8 @@ class Routes{
   static const String forgetPasswordRoute ="/forgetPasswordRoute";
   static const String otpScreenRoute ="/otpScreenRoute";
   static const String newPasswordRoute ="/newPasswordRoute";
-  static const String homeRoute ="/homeRoute";
+  static const String homeScreenState ="/homeScreenState";
+  static const String addComplaintScreen ="/addComplaintScreen";
+
+
 }

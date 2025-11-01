@@ -82,7 +82,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       imagePath: "assets/images/onboarding2.png",
                       title: "Report in Seconds",
                       subtitle:
-                      "It’s faster than you think. Snap a photo, add the location, and send your report in under 30 seconds.",
+                      "It’s faster than you think. Snap a photo, add the location_bloc, and send your report in under 30 seconds.",
                     ),
                     BuildPage(
                       imageWidth: 360,

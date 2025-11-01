@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nazra/peresentation/resources/color_manager.dart';
+import 'package:nazra/peresentation/resources/styles_manager.dart';
 import 'package:nazra/peresentation/resources/value_manager.dart';
 
 class AppTextField extends StatelessWidget {
@@ -42,7 +43,7 @@ class AppTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.1),
+            color: Colors.black12.withOpacity(0.1),
             spreadRadius: 2,
             blurRadius: 6,
             offset: const Offset(0, 4),
@@ -64,9 +65,11 @@ class AppTextField extends StatelessWidget {
               validator: validator,
               onChanged: onChanged,
               keyboardType: keyboardType,
+              style: regularStyle(fontSize: 16, color: Colors.black87),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle:  TextStyle(
+                  fontSize: 16,
                   color: hintColor,
                   fontFamily: "Poppins",
                 ),
