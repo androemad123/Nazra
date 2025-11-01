@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nazra/peresentation/Auth/login/login_screen.dart';
 import 'package:nazra/peresentation/Auth/signUp/signup_screen.dart';
-import 'package:nazra/peresentation/Home/home.dart';
 import 'package:nazra/peresentation/complains/add_complaint_screen.dart';
 import 'package:nazra/peresentation/forget%20Password/new_password_screen.dart';
 import 'package:nazra/peresentation/forget%20Password/otp_screen.dart';

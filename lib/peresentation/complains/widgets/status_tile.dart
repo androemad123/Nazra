@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:nazra/peresentation/resources/color_manager.dart';
-import 'package:nazra/peresentation/resources/font_manager.dart';
 import 'package:nazra/peresentation/resources/styles_manager.dart';
 
 class StatusTile extends StatelessWidget {

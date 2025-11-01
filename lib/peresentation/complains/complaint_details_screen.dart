@@ -4,7 +4,6 @@ import 'package:nazra/peresentation/complains/widgets/status_tile.dart';
 import '../../app/models/complaint_model.dart';
 import '../resources/color_manager.dart';
 import '../resources/styles_manager.dart';
-import '../widgets/app_text_btn.dart';
 import 'package:intl/intl.dart';
 
 class ComplaintDetailsScreen extends StatelessWidget {

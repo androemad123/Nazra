@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-  import 'package:nazra/generated/l10n.dart';
 import 'package:nazra/peresentation/Home/rotating_banner.dart';
 import 'package:nazra/peresentation/resources/color_manager.dart';
 import 'package:nazra/peresentation/resources/styles_manager.dart';
 
-import '../../app/app_context.dart';
 import '../../routing/routes.dart';
 
 class Home extends StatefulWidget {
