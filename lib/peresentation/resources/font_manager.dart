@@ -3,6 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FontConstants {
   static const String fontFamily = "Poppins";
+  static const String arabicFontFamily = "Tajawal";
+  
+  static String getFontFamily(String languageCode) {
+    return languageCode == 'ar' ? arabicFontFamily : fontFamily;
+  }
 }
 
 class FontWeightManager {

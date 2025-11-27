@@ -1,0 +1,189 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /********************************************
+     *                FUNCTIONS
+     ********************************************/
+
+    function getCommunity(communityId) {
+      return get(/databases/$(database)/documents/communities/$(communityId)).data;
+    }
+
+    function isAuthed() {
+      return request.auth != null;
+    }
+
+    function isOwner(communityId) {
+      return isAuthed()
+        && getCommunity(communityId).ownerId == request.auth.uid;
+    }
+
+    // FIXED — works for both Map and List
+    function isMember(communityId) {
+      let c = getCommunity(communityId);
+
+      return isAuthed()
+        && c.members != null
+        && (
+              (c.members[request.auth.uid] == true) ||
+              (c.members is list && request.auth.uid in c.members)
+           );
+    }
+
+    function isCreator() {
+      return isAuthed()
+        && request.auth.uid == resource.data.creatorId;
+    }
+
+    function createsAs(uid) {
+      return isAuthed()
+        && request.auth.uid == uid;
+    }
+
+    // 🔥 ADMIN CHECK
+    function isAdmin() {
+      return isAuthed() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+
+    /********************************************
+     *                USERS
+     ********************************************/
+    match /users/{userId} {
+      allow read: if isAuthed() || isAdmin();
+      allow write: if (request.auth.uid == userId) || isAdmin();
+    }
+
+
+    /********************************************
+     *                COMPLAINTS
+     ********************************************/
+    match /complaints/{complaintId} {
+      allow create: if isAuthed() || isAdmin();
+      allow read: if true;
+
+      allow update, delete: if isAdmin();
+    }
+
+
+    /********************************************
+     *                COMMUNITIES
+     ********************************************/
+    match /communities/{communityId} {
+      allow read: if isAuthed() || isAdmin();
+      allow create: if isAuthed() || isAdmin();
+
+      allow update, delete: if isOwner(communityId) || isAdmin();
+    }
+
+
+    /********************************************
+     *         COMMUNITY JOIN REQUESTS
+     ********************************************/
+    match /communities/{communityId}/joinRequests/{requestId} {
+      allow create: if isAuthed() || isAdmin();
+
+      allow read, update, delete:
+        if isOwner(communityId) || isAdmin();
+    }
+
+
+    /********************************************
+     *               COMMUNITY ISSUES
+     ********************************************/
+    match /communities/{communityId}/issues/{issueId} {
+      allow read, create: if isMember(communityId) || isAdmin();
+
+      allow update, delete:
+          if isOwner(communityId)
+          || isCreator()
+          || isAdmin();
+    }
+
+
+   /********************************************
+ *             ISSUE VOTES (TOP LEVEL)
+ ********************************************/
+match /issues/{issueId}/votes/{voteId} {
+
+  function linkedCommunity() {
+    return get(/databases/$(database)/documents/issues/$(issueId)).data.communityId;
+  }
+
+  // Members of the issue's community can vote
+  allow create, update: if isMember(linkedCommunity()) || isAdmin();
+
+  allow read: if isAuthed() || isAdmin();
+}
+
+
+    /********************************************
+     *               NOTIFICATIONS
+     ********************************************/
+    match /notifications/{id} {
+
+      allow read:
+          if (request.auth.uid == resource.data.recipientId)
+          || isAdmin();
+
+      allow create: if isAuthed() || isAdmin();
+
+      // FIX → removed invalid userId reference
+      allow update:
+          if (request.auth.uid == resource.data.recipientId || isAdmin())
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead'])
+          && request.resource.data.isRead is bool;
+
+      allow delete: if false;
+    }
+
+
+    /********************************************
+     *               ACTIVITY LOGS
+     ********************************************/
+    match /activity_logs/{logId} {
+
+      allow read:
+          if request.auth.uid == resource.data.userId
+          || isAdmin();
+
+      allow create:
+          if request.resource.data.userId == request.auth.uid
+          || isAdmin();
+
+      allow update, delete: if false;
+    }
+
+
+    /********************************************
+     *       TOP-LEVEL ISSUES (if used)
+     ********************************************/
+    match /issues/{issueId} {
+
+      function linkedCommunity() {
+        return resource.data.communityId;
+      }
+
+      allow read:
+          if isMember(linkedCommunity()) || isAdmin();
+
+      allow create:
+          if isMember(request.resource.data.communityId) || isAdmin();
+
+      // ✅ FIXED: Allow members to update votes
+      allow update:
+          if isOwner(linkedCommunity())
+          || isCreator()
+          || isAdmin()
+          || (isMember(linkedCommunity()) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votes', 'updatedAt']));
+
+      allow delete:
+          if isOwner(linkedCommunity())
+          || isCreator()
+          || isAdmin();
+    }
+  }
+}

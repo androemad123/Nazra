@@ -4,6 +4,8 @@ import 'package:nazra/peresentation/resources/color_manager.dart';
 import 'package:nazra/peresentation/resources/styles_manager.dart';
 
 import '../../routing/routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../app/bloc/notification/notification_bloc.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -14,8 +16,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    context.read<NotificationBloc>().add(LoadNotifications());
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0, // Hides the default AppBar
@@ -35,10 +42,9 @@ class _HomeState extends State<Home> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Welcome!',
-                        style: semiBoldStyle(fontSize: 25, color: Color(0xff2E2E2E))
-                      ),
+                      Text('Welcome!',
+                          style: semiBoldStyle(
+                              fontSize: 25, color: Color(0xff2E2E2E))),
                       SizedBox(height: 4),
                       Text(
                         'Your report makes the difference',
@@ -55,7 +61,24 @@ class _HomeState extends State<Home> {
                       color: Colors.grey[200],
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.notifications_none, color: Colors.grey[700]),
+                    child: BlocBuilder<NotificationBloc, NotificationState>(
+                      builder: (context, state) {
+                        int unreadCount = 0;
+                        if (state is NotificationLoaded) {
+                          unreadCount = state.unreadCount;
+                        }
+                        return IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, Routes.notificationsScreen);
+                            },
+                            icon: Badge(
+                              isLabelVisible: unreadCount > 0,
+                              label: Text('$unreadCount'),
+                              child: Icon(Icons.notifications_none_outlined),
+                            ));
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -91,7 +114,8 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-    );  }
+    );
+  }
 
   Widget _buildFeatureCard({
     required IconData icon,
@@ -124,15 +148,13 @@ class _HomeState extends State<Home> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: semiBoldStyle(fontSize: 18, color: Colors.black87)
-                    ),
+                    Text(title,
+                        style:
+                            semiBoldStyle(fontSize: 18, color: Colors.black87)),
                     SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: regularStyle(fontSize: 14, color: Colors.black38)
-                    ),
+                    Text(subtitle,
+                        style:
+                            regularStyle(fontSize: 14, color: Colors.black38)),
                   ],
                 ),
               ),

@@ -65,7 +65,7 @@ class AppTextField extends StatelessWidget {
               validator: validator,
               onChanged: onChanged,
               keyboardType: keyboardType,
-              style: regularStyle(fontSize: 16, color: Colors.black87),
+              style: regularStyle(fontSize: 16, color: Colors.black),
               decoration: InputDecoration(
                 hintText: hintText,
                 hintStyle:  TextStyle(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nazra/peresentation/resources/color_manager.dart';
 import 'package:nazra/peresentation/resources/styles_manager.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -7,6 +8,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nazra/peresentation/widgets/app_text_btn.dart';
 
 import '../../app/services/image_picker_service.dart';
+import '../../app/services/cloudinary_service.dart';
+import '../../app/services/ml_api_service.dart';
+import '../../app/repositories/complaint_repository.dart';
+import '../../app/bloc/location_bloc/location_bloc.dart';
 import 'map_sample.dart';
 
 class AddComplaintScreen extends StatefulWidget {
@@ -22,6 +27,23 @@ class _AddComplaintScreenState extends State<AddComplaintScreen> {
 
   List<File> _imageFiles = [];
   final ImagePickerService _imageService = ImagePickerService();
+  final CloudinaryService _cloudinaryService = CloudinaryService();
+  final MlApiService _mlApiService = MlApiService();
+  final ComplaintRepository _complaintRepository = ComplaintRepository();
+
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize location when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final locationBloc = context.read<LocationBloc>();
+      if (locationBloc.state is LocationInitial) {
+        locationBloc.add(FetchLocation());
+      }
+    });
+  }
 
   void _showPickerDialog() {
     showModalBottomSheet(
@@ -63,6 +85,145 @@ class _AddComplaintScreenState extends State<AddComplaintScreen> {
     'Garbage collection',
     'Road damage',
   ];
+
+  /// Handles the submission of the complaint
+  /// 
+  /// 1. Validates all required fields
+  /// 2. Gets the current location from LocationBloc
+  /// 3. Uploads images to Cloudinary with metadata
+  /// 4. Sends image URLs to ML API for analysis
+  /// 5. Saves everything to Firestore
+  Future<void> _handleSubmit() async {
+    // Validate fields
+    if (_selectedProblemType == null || _selectedProblemType!.isEmpty) {
+      _showSnackBar('Please select a problem type', isError: true);
+      return;
+    }
+
+    if (_descriptionController.text.trim().isEmpty) {
+      _showSnackBar('Please enter a description', isError: true);
+      return;
+    }
+
+    if (_imageFiles.isEmpty) {
+      _showSnackBar('Please add at least one photo', isError: true);
+      return;
+    }
+
+    // Get location from LocationBloc
+    final locationBloc = context.read<LocationBloc>();
+    final locationState = locationBloc.state;
+    
+    if (locationState is! LocationLoaded) {
+      // Try to fetch location if not loaded
+      locationBloc.add(FetchLocation());
+      _showSnackBar('Please wait for location to load', isError: true);
+      return;
+    }
+
+    final position = locationState.position;
+    final address = locationState.address;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      // Step 1: Upload images to Cloudinary with metadata
+      _showSnackBar('Uploading images...');
+      
+      final imageUrls = await _cloudinaryService.uploadImages(
+        imageFiles: _imageFiles,
+        description: _descriptionController.text.trim(),
+        category: _selectedProblemType!,
+      );
+
+      if (imageUrls.isEmpty) {
+        throw Exception('Failed to upload images. Please try again.');
+      }
+
+      // Step 2: Send image URLs to ML API for analysis
+      _showSnackBar('Analyzing image with AI...');
+      
+      final mlResult = await _mlApiService.analyzeImages(
+        imageUrls: imageUrls,
+        description: _descriptionController.text.trim(),
+        category: _selectedProblemType!,
+      );
+
+      Map<String, dynamic>? normalizedMlResult;
+      if (mlResult != null) {
+        final aiData = mlResult['data'];
+        normalizedMlResult = {
+          'is_issue': mlResult['is_issue'] ?? true,
+          'data': aiData is Map<String, dynamic>
+              ? Map<String, dynamic>.from(aiData)
+              : <String, dynamic>{},
+        };
+      }
+
+      // Step 3: Save to Firestore
+      _showSnackBar('Saving complaint...');
+      
+      final complaintId = await _complaintRepository.addComplaint(
+        imageUrls: imageUrls,
+        description: _descriptionController.text.trim(),
+        category: _selectedProblemType!,
+        location: position,
+        address: address,
+        mlAnalysisResult: normalizedMlResult,
+      );
+
+      if (complaintId != null) {
+        // Success!
+        _showSnackBar('Complaint submitted successfully!');
+        
+        // Clear form
+        _descriptionController.clear();
+        setState(() {
+          _selectedProblemType = null;
+          _imageFiles.clear();
+        });
+
+        // Optionally navigate back after a short delay
+        await Future.delayed(const Duration(seconds: 1));
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        throw Exception('Failed to save complaint. Please try again.');
+      }
+    } catch (e) {
+      _showSnackBar(
+        'Error: ${e.toString().replaceAll('Exception: ', '')}',
+        isError: true,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    if (!mounted) return;
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.redAccent : Colors.green,
+        duration: Duration(seconds: isError ? 4 : 2),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -273,7 +434,12 @@ class _AddComplaintScreenState extends State<AddComplaintScreen> {
             SizedBox(height: 20.h),
 
             // Submit Button
-            AppTextBtn(buttonText: "Submit", textStyle: semiBoldStyle(fontSize: 16, color: Colors.white), onPressed: (){})
+            AppTextBtn(
+              buttonText: _isSubmitting ? "Submitting..." : "Submit",
+              textStyle: semiBoldStyle(fontSize: 16, color: Colors.white),
+              onPressed: _isSubmitting ? () {} : () => _handleSubmit(),
+            ),
+            SizedBox(height: 40.h),
           ],
         ),
       ),

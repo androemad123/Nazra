@@ -8,6 +8,7 @@ import '../../../app/bloc/auth/auth_bloc.dart';
 import '../../../app/bloc/auth/auth_event.dart';
 import '../../../app/bloc/auth/auth_state.dart';
 import '../../../app/providers/theme_provider.dart';
+import '../../../generated/l10n.dart';
 import '../../../routing/routes.dart';
 import '../../resources/color_manager.dart';
 import '../../resources/styles_manager.dart';
@@ -49,14 +50,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all required fields")),
+        SnackBar(content: Text(S.of(context).pleaseFillAllFields)),
       );
       return;
     }
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
+        SnackBar(content: Text(S.of(context).passwordsDoNotMatch)),
       );
       return;
     }
@@ -79,20 +80,20 @@ class _SignupScreenState extends State<SignupScreen> {
         switch (state.status) {
           case AuthStatus.loading:
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Creating account...")),
+              SnackBar(content: Text(S.of(context).creatingAccount)),
             );
             break;
 
           case AuthStatus.authenticated:
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Account created successfully!")),
+              SnackBar(content: Text(S.of(context).accountCreatedSuccess)),
             );
             Navigator.pushReplacementNamed(context, Routes.homeScreenState);
             break;
 
           case AuthStatus.failure:
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.error ?? 'Signup failed')),
+              SnackBar(content: Text(state.error ?? S.of(context).signupFailed)),
             );
             break;
 
@@ -152,7 +153,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       ],
                                     ).createShader(bounds),
                                     child: Text(
-                                      "Create",
+                                      S.of(context).create,
                                       style: semiBoldStyle(
                                         fontSize: 40.sp,
                                         color: Colors.white,
@@ -161,7 +162,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
-                                    "your",
+                                    S.of(context).createYourAccount.split(' ')[1], // "your"
                                     style: semiBoldStyle(
                                       fontSize: 40,
                                       color: Colors.black,
@@ -170,7 +171,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ],
                               ),
                               Text(
-                                "Account",
+                                S.of(context).createYourAccount.split(' ').last, // "Account"
                                 style: semiBoldStyle(
                                   fontSize: 40,
                                   color: Colors.black,
@@ -179,31 +180,31 @@ class _SignupScreenState extends State<SignupScreen> {
 
                               // Fields
                               AppTextField(
-                                hintText: "Full name",
+                                hintText: S.of(context).fullNameHint,
                                 isPassword: false,
                                 controller: _nameController,
                                 prefixIcon: Icons.person_3_outlined,
                               ),
                               AppTextField(
-                                hintText: "Email",
+                                hintText: S.of(context).emailHint,
                                 isPassword: false,
                                 controller: _emailController,
                                 prefixIcon: Icons.email_outlined,
                               ),
                               AppTextField(
-                                hintText: "Phone number",
+                                hintText: S.of(context).phoneHint,
                                 isPassword: false,
                                 controller: _phoneController,
                                 prefixIcon: Icons.phone_iphone_outlined,
                               ),
                               AppTextField(
-                                hintText: "Password",
+                                hintText: S.of(context).passwordHint,
                                 isPassword: true,
                                 controller: _passwordController,
                                 prefixIcon: Icons.lock_outline,
                               ),
                               AppTextField(
-                                hintText: "Confirm password",
+                                hintText: S.of(context).confirmPasswordHint,
                                 isPassword: true,
                                 controller: _confirmPasswordController,
                                 prefixIcon: Icons.lock_outline,
@@ -213,7 +214,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                               AppTextBtn(
                                 buttonText:
-                                isLoading ? "Creating Account..." : "Sign Up",
+                                isLoading ? S.of(context).creatingAccount : S.of(context).signupButton,
                                 textStyle: semiBoldStyle(
                                   fontSize: 18,
                                   color: Colors.white,
@@ -226,7 +227,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               const SizedBox(height: 20),
 
                               DividerWithText(
-                                text: "Or sign up with",
+                                text: S.of(context).orSignupWith,
                                 lineColor: Colors.grey.shade400,
                                 textStyle: regularStyle(
                                   fontSize: 14,
@@ -265,14 +266,14 @@ class _SignupScreenState extends State<SignupScreen> {
                               Center(
                                 child: RichText(
                                   text: TextSpan(
-                                    text: "Already have an account? ",
+                                    text: S.of(context).alreadyHaveAccount,
                                     style: regularStyle(
                                       fontSize: 16,
                                       color: Colors.black54,
                                     ),
                                     children: [
                                       TextSpan(
-                                        text: 'Sign in',
+                                        text: S.of(context).signIn,
                                         style: semiBoldStyle(
                                           fontSize: 16,
                                           color: ColorManager.brown,

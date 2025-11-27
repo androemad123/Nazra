@@ -10,5 +10,8 @@ class Routes{
   static const String homeScreenState ="/homeScreenState";
   static const String addComplaintScreen ="/addComplaintScreen";
 
+  static const String notificationsScreen ="/notificationsScreen";
+  static const String adminHomeScreen ="/adminHomeScreen";
+
 
 }

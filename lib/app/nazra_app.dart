@@ -10,13 +10,32 @@ import 'package:nazra/routing/routes.dart';
 import 'package:provider/provider.dart';
 
 class NazraApp extends StatefulWidget {
-  const NazraApp({super.key, required this.appRouter});
+  const NazraApp({
+    super.key, 
+    required this.appRouter, 
+    required this.navigatorKey,
+    required this.initialRoute,
+  });
+
   final AppRouter appRouter;
-  static NazraApp? instance;
-  factory NazraApp.getInstance(AppRouter appRouter) {
-    instance ??= NazraApp(appRouter: appRouter);
-    return instance!;
+  final GlobalKey<NavigatorState> navigatorKey;
+  final String initialRoute;
+
+  static NazraApp? _instance;
+
+  factory NazraApp.getInstance(
+    AppRouter appRouter, 
+    GlobalKey<NavigatorState> navigatorKey,
+    String initialRoute,
+  ) {
+    _instance ??= NazraApp(
+      appRouter: appRouter, 
+      navigatorKey: navigatorKey,
+      initialRoute: initialRoute,
+    );
+    return _instance!;
   }
+
   @override
   State<NazraApp> createState() => _NazraAppState();
 }
@@ -24,19 +43,25 @@ class NazraApp extends StatefulWidget {
 class _NazraAppState extends State<NazraApp> {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final languageProvider = Provider.of<LanguageProvider>(context);
+    final themeProvider = context.watch<ThemeProvider>();
+    final languageProvider = context.watch<LanguageProvider>();
 
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (context, child) {
+      builder: (_, __) {
         return MaterialApp(
-          theme: ThemeManager.lightTheme,  // Light theme
-          darkTheme: ThemeManager.darkTheme, // Dark theme
-          themeMode: themeProvider.themeMode,
-          locale: languageProvider.locale,
+          navigatorKey: widget.navigatorKey,
+          debugShowCheckedModeBanner: false,
+
+          // ✅ Theme
+          theme: ThemeManager.getLightTheme(languageProvider.languageCode),
+          darkTheme: ThemeManager.getDarkTheme(languageProvider.languageCode),
+          themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+
+          // ✅ Localization
+          locale: Locale(languageProvider.languageCode),
           localizationsDelegates: const [
             S.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -44,8 +69,9 @@ class _NazraAppState extends State<NazraApp> {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: S.delegate.supportedLocales,
-          debugShowCheckedModeBanner: false,
-          initialRoute: Routes.onboardingRoute,
+
+          // ✅ Routing
+          initialRoute: widget.initialRoute,
           onGenerateRoute: widget.appRouter.onGenerateRoute,
         );
       },

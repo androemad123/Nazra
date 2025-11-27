@@ -8,6 +8,7 @@ import '../../../app/bloc/auth/auth_bloc.dart';
 import '../../../app/bloc/auth/auth_event.dart';
 import '../../../app/bloc/auth/auth_state.dart';
 import '../../../app/providers/theme_provider.dart';
+import '../../../generated/l10n.dart';
 import '../../../routing/routes.dart';
 import '../../resources/color_manager.dart';
 import '../../resources/styles_manager.dart';
@@ -64,7 +65,13 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         } else if (state.status == AuthStatus.authenticated) {
-          Navigator.of(context).pushReplacementNamed(Routes.homeScreenState);
+          // Check user role and navigate accordingly
+          final userRole = state.user?.role ?? 'user';
+          if (userRole == 'admin') {
+            Navigator.of(context).pushReplacementNamed(Routes.adminHomeScreen);
+          } else {
+            Navigator.of(context).pushReplacementNamed(Routes.homeScreenState);
+          }
         }
       },
       builder: (context, state) {
@@ -115,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ],
                             ).createShader(bounds),
                             child: Text(
-                              "Welcome",
+                              S.of(context).welcome,
                               style: semiBoldStyle(
                                 fontSize: 40.sp,
                                 color: Colors.white,
@@ -123,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           Text(
-                            "Back",
+                            S.of(context).back,
                             style: semiBoldStyle(
                                 fontSize: 40.sp, color: Colors.black),
                           ),
@@ -131,13 +138,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Email field
                           AppTextField(
-                            hintText: "Email",
+                            hintText: S.of(context).emailHint,
                             isPassword: false,
                             controller: _emailCtrl,
                             prefixIcon: Icons.email_outlined,
                             validator: (val) {
                               if (val == null || val.isEmpty) {
-                                return 'Please enter your email';
+                                return S.of(context).pleaseFillAllFields;
                               }
                               if (!val.contains('@')) {
                                 return 'Invalid email';
@@ -148,13 +155,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Password field
                           AppTextField(
-                            hintText: "Password",
+                            hintText: S.of(context).passwordHint,
                             isPassword: true,
                             controller: _passwordCtrl,
                             prefixIcon: Icons.lock_outline,
                             validator: (val) {
                               if (val == null || val.isEmpty) {
-                                return 'Please enter your password';
+                                return S.of(context).pleaseFillAllFields;
                               }
                               return null;
                             },
@@ -168,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     setState(() => rememberMe = val ?? false),
                               ),
                               Text(
-                                "Remember me",
+                                S.of(context).rememberMe,
                                 style: regularStyle(
                                   fontSize: 14.sp,
                                   color: Theme.of(context)
@@ -184,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Navigator.of(context)
                                       .pushNamed('/forgetPasswordRoute');
                                 },
-                                child: Text('Forgot password?',
+                                child: Text(S.of(context).forgotPassword,
                                     style: regularStyle(
                                       fontSize: 14.sp,
                                       color: Theme.of(context)
@@ -200,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Login button
                           AppTextBtn(
-                            buttonText: isLoading ? "Logging in..." : "Login",
+                            buttonText: isLoading ? S.of(context).loggingIn : S.of(context).loginButton,
                             textStyle: semiBoldStyle(
                               fontSize: 18.sp,
                               color: Colors.white,
@@ -212,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(height: 30.h),
 
                           DividerWithText(
-                            text: "Or continue with",
+                            text: S.of(context).orContinueWith,
                             lineColor: Colors.grey.shade400,
                             textStyle: regularStyle(
                               fontSize: 14.sp,
@@ -250,14 +257,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           Center(
                             child: RichText(
                               text: TextSpan(
-                                text: 'Don\'t have an account? ',
+                                text: S.of(context).dontHaveAccount,
                                 style: regularStyle(
                                   fontSize: 16.sp,
                                   color: Colors.black54,
                                 ),
                                 children: [
                                   TextSpan(
-                                    text: 'Sign up',
+                                    text: S.of(context).signupButton,
                                     style: semiBoldStyle(
                                       fontSize: 16.sp,
                                       color: ColorManager.brown,

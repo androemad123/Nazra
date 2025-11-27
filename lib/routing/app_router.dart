@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nazra/peresentation/notifications/notification_screen.dart';
 import 'package:nazra/peresentation/Auth/login/login_screen.dart';
 import 'package:nazra/peresentation/Auth/signUp/signup_screen.dart';
 import 'package:nazra/peresentation/complains/add_complaint_screen.dart';
@@ -8,6 +9,7 @@ import 'package:nazra/peresentation/onBoarding/onboarding_screen.dart';
 import 'package:nazra/routing/routes.dart';
 
 import '../peresentation/Home/home_screen_state.dart';
+import '../peresentation/admin/home/admin_home_base_screen.dart';
 import '../peresentation/forget Password/forget_password_screen.dart';
 
 class AppRouter {
@@ -30,6 +32,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const OtpScreen());
       case Routes.newPasswordRoute:
         return MaterialPageRoute(builder: (_) => const NewPasswordScreen());
+      case Routes.notificationsScreen:
+        return MaterialPageRoute(builder: (_) => const NotificationScreen());
+      case Routes.adminHomeScreen:
+        return MaterialPageRoute(builder: (_) => const AdminHomeBaseScreen());
       default:
         return null;
     }

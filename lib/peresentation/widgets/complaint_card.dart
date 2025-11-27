@@ -4,6 +4,7 @@ import 'package:nazra/peresentation/resources/color_manager.dart';
 import 'package:nazra/peresentation/resources/styles_manager.dart';
 import 'package:nazra/peresentation/widgets/app_text_btn.dart';
 import '../../app/models/complaint_model.dart';
+import '../../generated/l10n.dart';
 
 class ComplaintCard extends StatelessWidget {
   final Complaint complaint;
@@ -57,11 +58,26 @@ class ComplaintCard extends StatelessWidget {
     }
   }
 
+  Color _getPriorityColor(String priority) {
+    switch (priority.toLowerCase()) {
+      case 'emergency':
+      case 'high':
+        return Colors.red;
+      case 'medium':
+        return Colors.orange;
+      default:
+        return Colors.green;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final statusColor = _getStatusColor(complaint.status);
     final progress = _getProgressValue(complaint.status);
+    final priorityColor = _getPriorityColor(complaint.priority);
+    final aiConfidenceLabel =
+        complaint.aiAnalysis?.confidenceLabel ?? 'UNKNOWN';
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
@@ -169,7 +185,7 @@ class ComplaintCard extends StatelessWidget {
 
           /// 🔋 Progress
           Text(
-            "Progress",
+            S.of(context).progress,
             style: regularStyle(
               fontSize: 14.sp,
               color:
@@ -208,7 +224,7 @@ class ComplaintCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "AI Confidence: ${(complaint.aiConfidence * 100).toStringAsFixed(0)}%",
+                "${S.of(context).aiConfidence}: $aiConfidenceLabel",
                 style: regularStyle(
                   fontSize: 13.sp,
                   color: ColorManager.lightGray,
@@ -218,22 +234,14 @@ class ComplaintCard extends StatelessWidget {
                 padding:
                 EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: complaint.priority == 'high'
-                      ? Colors.red.withOpacity(0.1)
-                      : complaint.priority == 'medium'
-                      ? Colors.orange.withOpacity(0.1)
-                      : Colors.green.withOpacity(0.1),
+                  color: priorityColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Text(
-                  complaint.priority.toUpperCase(),
+                  complaint.priority.replaceAll('_', ' ').toUpperCase(),
                   style: semiBoldStyle(
                     fontSize: 12.sp,
-                    color: complaint.priority == 'high'
-                        ? Colors.red
-                        : complaint.priority == 'medium'
-                        ? Colors.orange
-                        : Colors.green,
+                    color: priorityColor,
                   ),
                 ),
               ),
@@ -244,7 +252,7 @@ class ComplaintCard extends StatelessWidget {
 
           /// 🟫 Details Button
           AppTextBtn(
-            buttonText: "Details",
+            buttonText: S.of(context).details,
             textStyle: semiBoldStyle(
               fontSize: 15.sp,
               color: ColorManager.white,

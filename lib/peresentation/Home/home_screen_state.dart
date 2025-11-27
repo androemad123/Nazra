@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nazra/peresentation/community/community_screen.dart';
 import 'package:nazra/peresentation/complains/complains_screen.dart';
 import 'package:nazra/peresentation/profile/profile_screen.dart';
 import 'package:nazra/peresentation/resources/color_manager.dart';
 import 'package:nazra/peresentation/resources/styles_manager.dart';
 
+import '../../generated/l10n.dart' show S;
 import 'home.dart';
 
 class HomeScreenState extends StatefulWidget {
@@ -61,17 +61,17 @@ class _HomeScreenStateState extends State<HomeScreenState> {
           items: [
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.home_filled, 0),
-              label: 'Home',
+              label: S.of(context).home,
             ),
             BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.edit_document, 1),
-                label: 'Complains'),
+                label: S.of(context).complaints),
             BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.people_outlined, 2),
-                label: 'Community'),
+                label: S.of(context).communities),
             BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.person_3_outlined, 3),
-                label: 'Profile'),
+                label: S.of(context).profile),
           ],
         ),
       ),

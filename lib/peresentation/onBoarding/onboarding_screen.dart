@@ -6,8 +6,8 @@ import 'package:nazra/peresentation/resources/font_manager.dart';
 import 'package:nazra/peresentation/resources/styles_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
 import '../../app/providers/theme_provider.dart';
+import '../../generated/l10n.dart';
 import '../../routing/routes.dart';
 import '../widgets/app_text_btn.dart';
 
@@ -30,77 +30,68 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
-      // No bottomSheet anymore
       body: Container(
-        // full-screen gradient (same as before)
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: themeProvider.isDarkMode
                 ? [
-              Theme.of(context).colorScheme.surface, // beige
-                  Theme.of(context).colorScheme.secondary, // lighter brown
-              Theme.of(context).colorScheme.surface, // beige
-
+              Theme.of(context).colorScheme.surface,
+              Theme.of(context).colorScheme.secondary,
+              Theme.of(context).colorScheme.surface,
             ]
                 : [
-              Theme.of(context).colorScheme.surface, // beige
-              Theme.of(context).colorScheme.background, // white
-              Theme.of(context).colorScheme.surface, // beige
-
+              Theme.of(context).colorScheme.surface,
+              Theme.of(context).colorScheme.background,
+              Theme.of(context).colorScheme.surface,
             ],
-
           ),
         ),
-        // build layout with PageView + bottom controls inside the same container
         child: SafeArea(
           child: Column(
             children: [
-              // PageView takes remaining space above controls
+              // --- PageView ---
               Expanded(
                 child: PageView(
                   controller: controller,
                   onPageChanged: (index) {
                     setState(() => isLastPage = index == 2);
                   },
-                  children: const [
+                  children: [
                     BuildPage(
                       imageHeight: 351,
                       imageWidth: double.maxFinite,
                       imagePath: 'assets/images/onboarding1.png',
-                      title: "See, Snap, Improve",
-                      subtitle:
-                      "With every glance, our streets get better. Report an issue and see it fixed",
+                      title: s.onboardTitle1,
+                      subtitle: s.onboardSubtitle1,
                     ),
                     BuildPage(
                       imageHeight: 340,
                       imageWidth: 350,
                       imagePath: "assets/images/onboarding2.png",
-                      title: "Report in Seconds",
-                      subtitle:
-                      "It’s faster than you think. Snap a photo, add the location_bloc, and send your report in under 30 seconds.",
+                      title: s.onboardTitle2,
+                      subtitle: s.onboardSubtitle2,
                     ),
                     BuildPage(
                       imageWidth: 360,
                       imageHeight: 340,
                       imagePath: "assets/images/onboarding3.png",
-                      title: "Follow the Progress",
-                      subtitle:
-                      "Stay updated every step of the way. From new report to solved — see how Nazra turns issues into improvements.",
+                      title: s.onboardTitle3,
+                      subtitle: s.onboardSubtitle3,
                     ),
                   ],
                 ),
               ),
 
-              // Bottom controls (indicator + buttons)
+              // --- Bottom Buttons ---
               Container(
                 height: 200.h,
                 padding: const EdgeInsets.all(10),
-                // no color -> transparent so gradient shows through
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -122,7 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       AppTextBtn(
                         buttonHeight: 56.h,
                         buttonWidth: 300.w,
-                        buttonText: "Login",
+                        buttonText: s.login,
                         textStyle: regularStyle(
                           fontSize: FontSize.s18,
                           color: Colors.white,
@@ -137,18 +128,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       AppTextBtn(
                         buttonHeight: 56.h,
                         buttonWidth: 300.w,
-                        buttonText: "Sign up",
+                        buttonText: s.signUp,
                         textStyle: regularStyle(
                           fontSize: FontSize.s18,
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
-                        onPressed: () {
-                          if (themeProvider.isDarkMode) {
-                            themeProvider.setTheme(ThemeMode.light);
-                          } else {
-                            themeProvider.setTheme(ThemeMode.dark);
-                          }
-                        },
+                        onPressed: () {},
                         backGroundColor: Colors.transparent,
                         borderRadius: 10,
                       ),
@@ -156,7 +141,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       AppTextBtn(
                         buttonHeight: 56.h,
                         buttonWidth: 300.w,
-                        buttonText: "Next",
+                        buttonText: s.next,
                         onPressed: () => controller.nextPage(
                           curve: Curves.easeInOut,
                           duration: const Duration(milliseconds: 300),
@@ -170,13 +155,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       AppTextBtn(
                         buttonHeight: 56.h,
                         buttonWidth: 300.w,
-                        buttonText: "Skip",
+                        buttonText: s.skip,
                         textStyle: regularStyle(
                           fontSize: FontSize.s18,
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
                         backGroundColor: Colors.transparent,
-
                         onPressed: () => controller.jumpToPage(2),
                       ),
                     ],

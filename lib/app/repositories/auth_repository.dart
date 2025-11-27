@@ -31,7 +31,12 @@ class AuthRepository {
         return AppUser.fromMap(doc.data()!, user.uid);
       } else {
         // Create minimal profile if absent
-        final profile = AppUser(uid: user.uid, email: user.email ?? '', displayName: user.displayName ?? '');
+        final profile = AppUser(
+          uid: user.uid,
+          email: user.email ?? '',
+          displayName: user.displayName ?? '',
+          role: 'user',
+        );
         await _firestore.collection('users').doc(user.uid).set(profile.toMap());
         return profile;
       }
@@ -52,7 +57,12 @@ class AuthRepository {
         await user.updateDisplayName(displayName);
       }
       // Save profile to Firestore
-      final appUser = AppUser(uid: user.uid, email: user.email ?? '', displayName: displayName ?? '');
+      final appUser = AppUser(
+        uid: user.uid,
+        email: user.email ?? '',
+        displayName: displayName ?? '',
+        role: 'user',
+      );
       await _firestore.collection('users').doc(user.uid).set(appUser.toMap());
       return appUser;
     } on FirebaseAuthException catch (e) {
@@ -74,7 +84,12 @@ class AuthRepository {
       if (doc.exists) {
         return AppUser.fromMap(doc.data()!, user.uid);
       } else {
-        final appUser = AppUser(uid: user.uid, email: user.email ?? '', displayName: user.displayName ?? '');
+        final appUser = AppUser(
+          uid: user.uid,
+          email: user.email ?? '',
+          displayName: user.displayName ?? '',
+          role: 'user',
+        );
         await _firestore.collection('users').doc(user.uid).set(appUser.toMap());
         return appUser;
       }
@@ -102,10 +117,20 @@ class AuthRepository {
       throw AuthFailure('Failed to send password reset email.');
     }
   }
-  AppUser? get currentUser {
+  Future<AppUser?> get currentUser async {
     final user = _auth.currentUser;
     if (user == null) return null;
-    return AppUser(uid: user.uid, email: user.email ?? '', displayName: user.displayName ?? '');
+    
+    final doc = await _firestore.collection('users').doc(user.uid).get();
+    if (doc.exists) {
+      return AppUser.fromMap(doc.data()!, user.uid);
+    }
+    return AppUser(
+      uid: user.uid,
+      email: user.email ?? '',
+      displayName: user.displayName ?? '',
+      role: 'user',
+    );
   }
 
   Future<void> sendEmailVerification() async {

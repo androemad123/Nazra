@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nazra/peresentation/profile/settings_screen.dart';
+import 'package:nazra/peresentation/profile/widget/profile_stat_card.dart';
+import 'package:nazra/peresentation/profile/widget/profile_tile.dart';
 import '../../../app/bloc/auth/auth_bloc.dart';
 import '../../../app/bloc/auth/auth_event.dart';
 import '../../../app/bloc/auth/auth_state.dart';
 import '../../../routing/routes.dart';
+import '../resources/color_manager.dart';
+import '../resources/styles_manager.dart';
+import 'activity_log_screen.dart';
+import '../../generated/l10n.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,16 +26,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
+
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.status == AuthStatus.unauthenticated) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Logged out successfully')),
+            SnackBar(content: Text(s.loggedOutSuccessfully)),
           );
           Navigator.pushReplacementNamed(context, Routes.loginRoute);
         } else if (state.status == AuthStatus.failure) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error ?? 'Logout failed')),
+            SnackBar(content: Text(state.error ?? s.logoutFailed)),
           );
         }
       },
@@ -37,72 +46,108 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final user = state.user;
 
         return Scaffold(
-          appBar: AppBar(
-            title: const Text("Profile"),
-            centerTitle: true,
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (user != null) ...[
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.brown.shade100,
-                    child: Text(
-                      user.displayName?.substring(0, 1).toUpperCase() ?? '?',
-                      style: const TextStyle(
-                        fontSize: 30,
-                        color: Colors.brown,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // --- Profile Icon ---
+                    CircleAvatar(
+                      radius: 45,
+                      backgroundColor: ColorManager.beige,
+                      child: Icon(
+                        Icons.person,
+                        color: ColorManager.brown,
+                        size: 45,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    user.displayName ?? 'Unknown User',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 12),
+                    Text(
+                      user?.displayName ?? s.defaultUserName,
+                      style: semiBoldStyle(fontSize: 18, color: ColorManager.darkGray),
                     ),
-                  ),
-                  Text(
-                    user.email,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
+                    const SizedBox(height: 4),
+                    Text(
+                      user?.email ?? s.defaultUserEmail,
+                      style: regularStyle(fontSize: 14, color: ColorManager.gray),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 28),
 
-                const SizedBox(height: 40),
+                    // --- Stats Row ---
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ProfileStatCard(
+                          label: s.points,
+                          value: '0',
+                          icon: Icons.emoji_events_outlined,
+                        ),
+                        ProfileStatCard(
+                          label: s.communities,
+                          value: '1',
+                          icon: Icons.people_alt_outlined,
+                        ),
+                        ProfileStatCard(
+                          label: s.complaints,
+                          value: '1',
+                          icon: Icons.receipt_long_outlined,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 28),
 
-                ElevatedButton.icon(
-                  onPressed: isLoading ? null : () => _onLogoutPressed(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.brown,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    // --- Action Tiles ---
+                    ProfileTile(
+                      icon: Icons.settings_outlined,
+                      title: s.settings,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                        );
+                      },
                     ),
-                  ),
-                  icon: isLoading
-                      ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
+                    ProfileTile(
+                      icon: Icons.list_alt_outlined,
+                      title: s.activityLog,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ActivityLogScreen()),
+                        );
+                      },
                     ),
-                  )
-                      : const Icon(Icons.logout, color: Colors.white),
-                  label: Text(
-                    isLoading ? 'Logging out...' : 'Logout',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+                    ProfileTile(
+                      icon: Icons.card_giftcard_outlined,
+                      title: s.rewardsCenter,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                        );
+                      },
+                    ),
+                    ProfileTile(
+                      icon: Icons.help_outline,
+                      title: s.help,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                        );
+                      },
+                    ),
+                    ProfileTile(
+                      icon: Icons.logout,
+                      title: isLoading ? s.loggingOut : s.logout,
+                      onTap: isLoading ? null : () => _onLogoutPressed(context),
+                      iconColor: ColorManager.brown,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
